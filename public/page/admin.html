@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>لوحة التحكم — نظام الحضور</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <h2>🎓 نظام الحضور</h2>
+            <p>لوحة التحكم الرئيسية</p>
+        </div>
+        <nav class="nav">
+            <button class="nav-item active" onclick="showPanel('sessions')" id="nav-sessions">
+                <span class="nav-icon">📋</span> الجلسات
+            </button>
+            <button class="nav-item" onclick="showPanel('students')" id="nav-students">
+                <span class="nav-icon">👥</span> الطلبة
+            </button>
+            <button class="nav-item" onclick="showPanel('supervisors')" id="nav-supervisors">
+                <span class="nav-icon">🛡️</span> المشرفون
+            </button>
+            <hr style="border:none;border-top:1px solid #ffffff12;margin:8px 0">
+            <button class="nav-item" onclick="window.location.href='/page/scan.html'">
+                <span class="nav-icon">📷</span> صفحة المسح
+            </button>
+            <button class="nav-item" onclick="window.location.href='/page/cards.html'">
+                <span class="nav-icon">🪪</span> بطاقات QR
+            </button>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout-side" onclick="logout()"><span>⬅️</span> تسجيل الخروج</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div style="display:flex;align-items:center;gap:.75rem">
+                <button class="hamburger" id="hamburger-btn" onclick="toggleSidebar()"
+                    style="display:none;background:none;border:1px solid var(--border);border-radius:8px;padding:6px 8px;cursor:pointer;color:var(--text);font-size:1.1rem;line-height:1">
+                    ☰
+                </button>
+                <span class="topbar-title" id="page-title">الجلسات</span>
+            </div>
+            <div class="supervisor-badge">
+                <span class="dot"></span>
+                <span id="sup-name">...</span>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- Sessions panel -->
+            <div class="panel active" id="panel-sessions">
+                <div class="stats-row">
+                    <div class="stat-card blue">
+                        <div class="label">إجمالي الجلسات</div>
+                        <div class="value" id="stat-sessions">—</div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="label">إجمالي الطلبة</div>
+                        <div class="value" id="stat-students">—</div>
+                    </div>
+                    <div class="stat-card purple">
+                        <div class="label">المشرفون</div>
+                        <div class="value" id="stat-sups">—</div>
+                    </div>
+                </div>
+                <div class="form-card">
+                    <h3>➕ إنشاء جلسة جديدة</h3>
+                    <div class="form-row">
+                        <div class="field">
+                            <label>عنوان الجلسة</label>
+                            <input type="text" id="sess-title" placeholder="مثال: محاضرة الإحصاء — أسبوع 5">
+                        </div>
+                        <div class="field">
+                            <label>التاريخ</label>
+                            <input type="date" id="sess-date">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="createSession()">✦ إنشاء الجلسة</button>
+                </div>
+                <div class="section-head">
+                    <h2>قائمة الجلسات</h2>
+                    <button class="btn btn-ghost" onclick="loadSessions()" style="font-size:13px">🔄 تحديث</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>العنوان</th>
+                                <th>التاريخ</th>
+                                <th>تفاصيل</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-tbody">
+                            <tr>
+                                <td colspan="5" style="padding:2rem;text-align:center;color:#64748b">جاري التحميل...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Students panel -->
+            <div class="panel" id="panel-students">
+                <div class="form-card">
+                    <h3>📤 استيراد الطلبة من CSV</h3>
+                    <p style="font-size:13px;color:#64748b;margin-bottom:1rem">
+                        يجب أن يحتوي الملف على عمود
+                        <code style="background:#22263a;padding:2px 6px;border-radius:4px">name</code>
+                        وعمود اختياري
+                        <code style="background:#22263a;padding:2px 6px;border-radius:4px">phone</code>
+                    </p>
+                    <div class="upload-zone" id="upload-zone">
+                        <input type="file" id="csv-file" accept=".csv" onchange="previewCSV(this)">
+                        <div class="upload-icon">📂</div>
+                        <p><strong>اضغط لاختيار ملف</strong> أو اسحب وأفلت هنا</p>
+                        <p style="margin-top:4px;font-size:12px">CSV فقط</p>
+                    </div>
+                    <div id="csv-preview" style="display:none">
+                        <div
+                            style="display:flex;align-items:center;justify-content:space-between;margin-top:1rem;flex-wrap:wrap;gap:.5rem">
+                            <span id="csv-filename" style="font-size:13px;color:#64748b"></span>
+                            <div style="display:flex;gap:.5rem">
+                                <button class="btn btn-ghost" onclick="clearCSV()" style="font-size:13px">✕
+                                    إلغاء</button>
+                                <button class="btn btn-primary" onclick="importCSV()" id="btn-import">⬆ استيراد</button>
+                            </div>
+                        </div>
+                        <div class="preview-table-wrap">
+                            <table>
+                                <thead>
+                                    <tr id="preview-head"></tr>
+                                </thead>
+                                <tbody id="preview-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-head">
+                    <h2>قائمة الطلبة</h2>
+                    <button class="btn btn-ghost" onclick="loadStudents()" style="font-size:13px">🔄 تحديث</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الاسم</th>
+                                <th>رقم الهاتف</th>
+                                <th>رمز QR</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-tbody">
+                            <tr>
+                                <td colspan="4" style="padding:2rem;text-align:center;color:#64748b">جاري التحميل...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Supervisors panel -->
+            <div class="panel" id="panel-supervisors">
+                <div class="form-card">
+                    <h3>➕ إضافة مشرف جديد</h3>
+                    <div class="form-row">
+                        <div class="field">
+                            <label>اسم المستخدم</label>
+                            <input type="text" id="sup-username" placeholder="admin2">
+                        </div>
+                        <div class="field">
+                            <label>الاسم الكامل</label>
+                            <input type="text" id="sup-fullname" placeholder="محمد أحمد">
+                        </div>
+                    </div>
+                    <div class="form-row" style="grid-template-columns:1fr">
+                        <div class="field">
+                            <label>كلمة المرور</label>
+                            <input type="password" id="sup-password" placeholder="••••••">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addSupervisor()">✦ إضافة المشرف</button>
+                </div>
+                <div class="section-head">
+                    <h2>قائمة المشرفين</h2>
+                    <button class="btn btn-ghost" onclick="loadSupervisors()" style="font-size:13px">🔄 تحديث</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>الاسم الكامل</th>
+                                <th>اسم المستخدم</th>
+                                <th>حذف</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supervisors-tbody">
+                            <tr>
+                                <td colspan="4" style="padding:2rem;text-align:center;color:#64748b">جاري التحميل...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Session details modal -->
+    <div class="modal-overlay" id="session-modal">
+        <div class="modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
+                <h3 style="margin:0" id="modal-title">تفاصيل الجلسة</h3>
+                <button class="btn btn-ghost" onclick="closeModal()" style="padding:4px 10px">✕</button>
+            </div>
+            <div class="attendance-stats" id="modal-stats"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="modal-progress" style="width:0%"></div>
+            </div>
+            <div style="max-height:350px;overflow-y:auto">
+                <table style="width:100%;border-collapse:collapse">
+                    <thead>
+                        <tr style="background:#22263a">
+                            <th
+                                style="padding:.6rem .875rem;text-align:right;font-size:11px;color:#64748b;border-bottom:1px solid #ffffff12">
+                                الطالب</th>
+                            <th
+                                style="padding:.6rem .875rem;text-align:right;font-size:11px;color:#64748b;border-bottom:1px solid #ffffff12">
+                                الحالة</th>
+                            <th
+                                style="padding:.6rem .875rem;text-align:right;font-size:11px;color:#64748b;border-bottom:1px solid #ffffff12">
+                                وقت المسح</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modal-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+    <!-- Bottom tab bar (mobile only) -->
+    <nav class="mobile-nav"
+        style="position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);z-index:190;padding:.5rem 0 .25rem;gap:0">
+        <button class="mob-tab" onclick="showPanel('sessions');closeSidebar()" id="mob-sessions">
+            <span style="font-size:1.25rem">📋</span><span>الجلسات</span>
+        </button>
+        <button class="mob-tab" onclick="showPanel('students');closeSidebar()" id="mob-students">
+            <span style="font-size:1.25rem">👥</span><span>الطلبة</span>
+        </button>
+        <button class="mob-tab" onclick="showPanel('supervisors');closeSidebar()" id="mob-supervisors">
+            <span style="font-size:1.25rem">🛡️</span><span>مشرفون</span>
+        </button>
+        <button class="mob-tab" onclick="window.location.href='/page/scan.html'">
+            <span style="font-size:1.25rem">📷</span><span>المسح</span>
+        </button>
+        <button class="mob-tab" onclick="window.location.href='/page/cards.html'">
+            <span style="font-size:1.25rem">🪪</span><span>QR</span>
+        </button>
+    </nav>
+
+    <div id="toast"></div>
+
+    <script src="../js/admin.js"></script>
+</body>
+
+</html>

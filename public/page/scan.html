@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مسح الحضور</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/scan.css">
+</head>
+
+<body>
+  <header>
+    <h1>📷 تسجيل الحضور</h1>
+    <div class="header-right">
+      <span class="sup-label" id="sup-name"></span>
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <!-- Live counter -->
+  <div class="counter-card" id="counter-card" style="display:none">
+    <div class="counter-group">
+      <div class="counter present">
+        <div class="num" id="cnt-present">0</div>
+        <div class="lbl">حضر</div>
+      </div>
+      <div class="counter absent">
+        <div class="num" id="cnt-absent">0</div>
+        <div class="lbl">غاب</div>
+      </div>
+      <div class="counter total">
+        <div class="num" id="cnt-total">0</div>
+        <div class="lbl">الكل</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-pct" id="cnt-pct">0%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="cnt-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="session-select">
+    <label>الجلسة الحالية</label>
+    <select id="session-select" onchange="onSessionChange()">
+      <option value="">— اختر جلسة —</option>
+    </select>
+  </div>
+
+  <div class="scanner-box">
+    <div class="video-wrap">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="scanning-overlay" id="scanning-overlay">
+        <div class="spinner"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-scan" id="btn-start" onclick="startScan()">▶ ابدأ المسح</button>
+      <button class="btn-stop" id="btn-stop" onclick="stopScan()">■ إيقاف</button>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="result-icon" id="result-icon"></div>
+    <div class="result-name" id="result-name"></div>
+    <div class="result-sub" id="result-sub"></div>
+  </div>
+
+  <div class="log">
+    <div class="log-header">
+      <h3>سجل الحضور</h3>
+      <span class="log-count" id="log-count">0</span>
+    </div>
+    <div id="log-list">
+      <p class="log-empty">لم يتم مسح أي طالب بعد</p>
+    </div>
+  </div>
+
+  <script type="module" src="../js/scan.js"></script>
+</body>
+
+</html>

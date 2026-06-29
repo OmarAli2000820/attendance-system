@@ -1,0 +1,51 @@
+### إضافة مشرف
+POST http://localhost:3000/api/supervisors/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "1234",
+  "name": "المشرف الرئيسي"
+}
+
+### تسجيل دخول
+POST http://localhost:3000/api/supervisors/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "1234"
+}
+
+###  مسح QR طالب
+POST http://localhost:3000/api/attendance/scan
+Content-Type: application/json
+
+{
+  "token": "9fd14513-6349-4b38-a421-f024e4779f1a",
+  "session_id": 1
+}
+
+### من أنا؟
+GET http://localhost:3000/api/supervisors/me
+
+### استيراد الطلبة
+POST http://localhost:3000/api/students/import
+
+### عرض كل الطلبة
+GET http://localhost:3000/api/students
+
+### إنشاء جلسة
+POST http://localhost:3000/api/sessions
+Content-Type: application/json
+
+{
+  "title": "المحاضرة الأولى — مقدمة",
+  "date": "2026-06-29"
+}
+
+### عرض كل الجلسات
+GET http://localhost:3000/api/sessions
+
+### تفاصيل جلسة
+GET http://localhost:3000/api/sessions/1
