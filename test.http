@@ -7,6 +7,7 @@ Content-Type: application/json
   "password": "1234",
   "name": "المشرف الرئيسي"
 }
+### hi
 
 ### تسجيل دخول
 POST http://localhost:3000/api/supervisors/login
@@ -48,4 +49,4 @@ Content-Type: application/json
 GET http://localhost:3000/api/sessions
 
 ### تفاصيل جلسة
-GET http://localhost:3000/api/sessions/1
+GET http://localhost:3000/api/sessions/3
